@@ -3,7 +3,6 @@ from netsquid.nodes import Node
 from netsquid.components import QuantumChannel
 from netsquid.protocols import NodeProtocol
 from netsquid.qubits import qubitapi as qapi
-from netsquid.components.models.qerrormodels import DephasingNoiseModel # Inietta Dephasing Noise
 import random
 
 # --- DEFINIZIONE DEI PROTOCOLLI ---
@@ -36,12 +35,13 @@ class SenderProtocol(NodeProtocol):
             yield self.await_timer(10)
 
 class CharlieProtocol(NodeProtocol):
-    def __init__(self, node, port_a, port_b, num_bits, name="Charlie"):
+    def __init__(self, node, port_a, port_b, num_bits, noise_probability=0.0, name="Charlie"):
         super().__init__(node, name)
         self.port_a = port_a
         self.port_b = port_b
         self.num_bits = num_bits
-        self.announcements = [] # Lista per i messaggi classici (la parità)
+        self.noise_probability = noise_probability # Controllo manuale del rumore
+        self.announcements = []
 
     def run(self):
         for i in range(self.num_bits):
@@ -55,15 +55,21 @@ class CharlieProtocol(NodeProtocol):
             qubit_a = msg_a.items[0]
             qubit_b = msg_b.items[0]
             
+            # --- INIEZIONE MANUALE DEL RUMORE (Dephasing) ---
+            # Se la probabilità è impostata, applichiamo una porta Z a sorpresa,
+            # invertendo la fase del fotone prima della misurazione.
+            if self.noise_probability > 0:
+                if random.random() < self.noise_probability:
+                    qapi.operate(qubit_a, ns.Z)
+                if random.random() < self.noise_probability:
+                    qapi.operate(qubit_b, ns.Z)
+            
             # 2. Estrazione della parità di fase
-            # Riportiamo in base Z
             qapi.operate(qubit_a, ns.H)
             qapi.operate(qubit_b, ns.H)
             
-            # Il CNOT "scrive" su qubit_b lo XOR tra i due bit (0 se uguali, 1 se diversi)
             qapi.operate([qubit_a, qubit_b], ns.CX)
             
-            # Misuriamo SOLO la parità (qubit_b) e scartiamo qubit_a (cancellazione informazione)
             res_parity, _ = qapi.measure(qubit_b)
             qapi.discard(qubit_a)
             
@@ -72,13 +78,14 @@ class CharlieProtocol(NodeProtocol):
 
 # --- SETUP E POST-PROCESSING ---
 
-def setup_and_run_tfqkd(num_bits=15):
+def setup_and_run_tfqkd(num_bits=15, noise_probability=0.0):
     ns.sim_reset()
     
     alice = Node("Alice", port_names=["port_out"])
     bob = Node("Bob", port_names=["port_out"])
     charlie = Node("Charlie", port_names=["port_in_a", "port_in_b"])
     
+    # Canali fisici standard senza modelli esterni bloccanti
     channel_a = QuantumChannel("Channel_Alice_Charlie", delay=10)
     channel_b = QuantumChannel("Channel_Bob_Charlie", delay=10)
     
@@ -90,13 +97,16 @@ def setup_and_run_tfqkd(num_bits=15):
     
     proto_alice = SenderProtocol(alice, "port_out", num_bits=num_bits)
     proto_bob = SenderProtocol(bob, "port_out", num_bits=num_bits)
-    proto_charlie = CharlieProtocol(charlie, "port_in_a", "port_in_b", num_bits=num_bits)
+    
+    # Passiamo la probabilità di rumore direttamente al setup di Charlie
+    proto_charlie = CharlieProtocol(charlie, "port_in_a", "port_in_b", 
+                                    num_bits=num_bits, noise_probability=noise_probability)
     
     proto_alice.start()
     proto_bob.start()
     proto_charlie.start()
     
-    print(f"--- Inizio Simulazione: Scambio di {num_bits} bit ---")
+    print(f"--- Inizio Simulazione: Scambio di {num_bits} bit [Probabilità Rumore: {noise_probability * 100}%] ---")
     ns.sim_run()
     
     # --- RICONCILIAZIONE DELLA CHIAVE ---
@@ -108,7 +118,6 @@ def setup_and_run_tfqkd(num_bits=15):
         bob_bit = proto_bob.raw_key[i]
         parity = proto_charlie.announcements[i]
         
-        # Se Charlie dice che erano diversi (parità = 1), Bob inverte il suo bit
         if parity == 1:
             bob_final_key.append(1 - bob_bit)
         else:
@@ -121,11 +130,23 @@ def setup_and_run_tfqkd(num_bits=15):
     print(f"Chiave Finale Alice: {alice_final_key}")
     print(f"Chiave Finale Bob:   {bob_final_key}")
     
-    # Verifica che le chiavi siano identiche
-    if alice_final_key == bob_final_key:
-        print("\n✅ SUCCESSO: Le chiavi corrispondono perfettamente!")
+    errors = sum(1 for a, b in zip(alice_final_key, bob_final_key) if a != b)
+    qber = (errors / num_bits) * 100
+    print(f"QBER calcolato sulla chiave finale: {qber:.2f}%")
+
+    # --- NUOVA VERIFICA DELLA SOGLIA DI SICUREZZA ---
+    SOGLIA_CRITICA_QBER = 11.0  # Soglia classica del 11%
+    
+    if qber == 0:
+        print("\n✅ SUCCESSO PERFETTO: Le chiavi corrispondono al 100%!")
+    elif qber <= SOGLIA_CRITICA_QBER:
+        print(f"\n⚠️ WARNING: Ci sono errori ({qber:.2f}%), ma siamo sotto la soglia del {SOGLIA_CRITICA_QBER}%.")
+        print("I bit errati possono essere corretti con algoritmi classici. Chiave SICURA.")
     else:
-        print("\n❌ ERRORE: Le chiavi non corrispondono.")
+        print(f"\n❌ ERRORE CRITICO: QBER al {qber:.2f}% (Soglia superata!).")
+        print("Troppo rumore o potenziale presenza di un intercettatore. Chiave SCARTATA.")
 
 if __name__ == "__main__":
-    setup_and_run_tfqkd(num_bits=15)
+    # noise_probability=0.5 distrugge sistematicamente la stabilità della chiave (QBER ~ 50%).
+    # Impostalo a 0.0 per farlo funzionare senza errori.
+    setup_and_run_tfqkd(num_bits=15, noise_probability=0.01)
