@@ -1,4 +1,4 @@
-conda create --prefix ./.venv python=3.12          # se si usa una versione superiore a 12 netsquid non ancora disponibile (3.10 per il progetto perché Gennaro ha usato fonti non ufficiali per scaricare nersquid)
+conda create --prefix ./.venv python=3.10          # se si usa una versione superiore a 13 netsquid non ancora disponibile (3.10 per il progetto perché Gennaro ha usato fonti non ufficiali per scaricare nersquid)
 conda activate ./.venv
 python <nam>.py
 
