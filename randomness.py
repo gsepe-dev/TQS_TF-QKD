@@ -23,9 +23,9 @@ def generate_random_bit() -> int:
     return random_bit
 
 
-def genera_sequenza(n: int) -> list[int]:
+def generate_sequence(n: int) -> list[int]:
     """Genera una sequenza di n bit casuali quantistici."""
     return [generate_random_bit() for _ in range(n)]
 
 #print(generate_random_bit())
-#print(genera_sequenza(11))
+#print(generate_sequence(11))
