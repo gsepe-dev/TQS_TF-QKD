@@ -4,6 +4,7 @@ from netsquid.components import QuantumChannel
 from netsquid.protocols import NodeProtocol
 from netsquid.qubits import qubitapi as qapi
 import random
+from randomness import generate_random_bit
 
 # --- DEFINIZIONE DEI PROTOCOLLI QUANTISTICI ---
 
@@ -16,7 +17,7 @@ class SenderProtocol(NodeProtocol):
 
     def run(self):
         for i in range(self.num_bits):
-            bit = random.choice([0, 1])
+            bit = generate_random_bit()
             self.raw_key.append(bit)
             qubit, = qapi.create_qubits(1)
             qapi.operate(qubit, ns.H)

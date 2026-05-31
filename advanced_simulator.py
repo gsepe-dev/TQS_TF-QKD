@@ -6,6 +6,7 @@ from netsquid.protocols import NodeProtocol
 from netsquid.qubits import qubitapi as qapi
 import random
 import math
+from randomness import generate_random_bit
 
 # =====================================================================
 # 1. PROTOCOLLI QUANTISTICI (FISICA DEI NODI E BSM)
@@ -22,8 +23,8 @@ class SenderProtocol(NodeProtocol):
 
     def run(self):
         for i in range(self.num_bits):
-            bit = random.choice([0, 1])
-            basis = random.choice([0, 1])
+            bit = generate_random_bit()
+            basis = generate_random_bit()
             self.raw_key.append(bit)
             self.bases.append(basis)
             
