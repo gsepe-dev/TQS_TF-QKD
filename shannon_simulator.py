@@ -39,7 +39,8 @@ def run_single_simulation(num_bits=200, noise_rate=0.0):
     
     # Avvio Simulazione
     proto_charlie.start(); proto_alice.start(); proto_bob.start()
-    ns.sim_run()
+    #ns.sim_run()
+    ns.sim_run(duration=num_bits * 11)
     
     # --- SIFTING CLASSICO ---
     alice_raw, alice_bases, bob_bases = proto_alice.raw_key, proto_alice.bases, proto_bob.bases
