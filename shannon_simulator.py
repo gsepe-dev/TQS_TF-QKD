@@ -20,7 +20,7 @@ def binary_entropy(p):
 # 3. ENGINE DELLA SINGOLA SIMULAZIONE FISICA
 # =====================================================================
 
-def run_single_simulation(num_bits=200, noise_rate=0.0):
+def run_single_simulation(num_bits=25, noise_rate=0.0):
     ns.sim_reset()
     
     # Inizializzazione Rete
@@ -82,12 +82,22 @@ def run_physical_benchmark(iterations_per_step=100):
     noise_steps = [round(x * 0.03, 2) for x in range(11)]  # Da 0.0 a 0.30
     
     for noise in noise_steps:
-        t_qber, t_skr = 0, 0
+
+        t_qber = 0
+
         for _ in range(iterations_per_step):
-            qber, skr = run_single_simulation(num_bits=200, noise_rate=noise)
-            t_qber += qber; t_skr += skr
-                
-        print(f"{noise:<20.2f}{(t_qber/iterations_per_step)*100:<20.1f}{t_skr/iterations_per_step:<15.4f}")
+            # Prendiamo solo il qber dalla singola simulazione
+            qber, _ = run_single_simulation(num_bits=25, noise_rate=noise)
+            t_qber += qber
+        
+        # Calcoliamo il QBER medio reale dello step
+        avg_qber = t_qber / iterations_per_step
+
+        # Calcoliamo l'SKR TEORICO del canale basandoci sul QBER medio ottenuto
+        skr_teorico = max(0, 1 - 2 * binary_entropy(avg_qber))
+
+        # Stampiamo i risultati corretti
+        print(f"{noise:<20.2f}{avg_qber*100:<20.1f}{skr_teorico:<15.4f}")
 
     print("=" * 70)
 
