@@ -18,19 +18,11 @@ class CharlieProtocol(NodeProtocol):
     def run(self):
         for i in range(self.num_bits):
             # attesa di qubit sul canale
-            # Aspetta prima il qubit da A...
-            yield self.await_port_input(self.node.ports[self.port_a])
+            yield self.await_port_input(self.node.ports[self.port_a]) & \
+                  self.await_port_input(self.node.ports[self.port_b])
+            
             qubit_a = self.node.ports[self.port_a].rx_input().items[0]
-
-            # ...poi aspetta il qubit da B
-            yield self.await_port_input(self.node.ports[self.port_b])
             qubit_b = self.node.ports[self.port_b].rx_input().items[0]
-            
-            msg_a = self.node.ports[self.port_a].rx_input()
-            msg_b = self.node.ports[self.port_b].rx_input()
-            
-            qubit_a = msg_a.items[0]
-            qubit_b = msg_b.items[0]
             
             # INIEZIONE DI RUMORE
             # Se la probabilità è impostata, applichiamo una porta Z a sorpresa,
