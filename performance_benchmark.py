@@ -2,60 +2,9 @@ import netsquid as ns
 from netsquid.nodes import Node
 from netsquid.components import QuantumChannel
 from netsquid.components.models.qerrormodels import DepolarNoiseModel
-from netsquid.protocols import NodeProtocol
-from netsquid.qubits import qubitapi as qapi
 import random
-from randomness import generate_random_bit
-
-# --- PROTOCOLLI QUANTISTICI PULITI (SENZA RUMORE SOFTWARE) ---
-
-class SenderProtocol(NodeProtocol):
-    def __init__(self, node, port_name, num_bits, name="Sender"):
-        super().__init__(node, name)
-        self.port_name = port_name
-        self.num_bits = num_bits
-        self.raw_key = []
-
-    def run(self):
-        for i in range(self.num_bits):
-            bit = generate_random_bit()
-            self.raw_key.append(bit)
-            
-            qubit, = qapi.create_qubits(1)
-            qapi.operate(qubit, ns.H)
-            if bit == 1:
-                qapi.operate(qubit, ns.Z)
-                
-            self.node.ports[self.port_name].tx_output(qubit)
-            yield self.await_timer(10)
-
-class CharlieProtocol(NodeProtocol):
-    def __init__(self, node, port_a, port_b, num_bits, name="Charlie"):
-        super().__init__(node, name)
-        self.port_a = port_a
-        self.port_b = port_b
-        self.num_bits = num_bits
-        self.announcements = []
-
-    def run(self):
-        for i in range(self.num_bits):
-            # Charlie attende i qubit che hanno viaggiato nel canale rumoroso
-            yield self.await_port_input(self.node.ports[self.port_a]) & \
-                  self.await_port_input(self.node.ports[self.port_b])
-            
-            msg_a = self.node.ports[self.port_a].rx_input()
-            msg_b = self.node.ports[self.port_b].rx_input()
-            qubit_a = msg_a.items[0]
-            qubit_b = msg_b.items[0]
-            
-            # Misurazione della parità di fase
-            qapi.operate(qubit_a, ns.H)
-            qapi.operate(qubit_b, ns.H)
-            qapi.operate([qubit_a, qubit_b], ns.CX)
-            res_parity, _ = qapi.measure(qubit_b)
-            qapi.discard(qubit_a)
-            
-            self.announcements.append(res_parity)
+from senderProtocol import SenderProtocol
+from charlieProtocol import CharlieProtocol
 
 # --- ALGORITMO CLASSICO DI CORREZIONE ERRORE (CASCADE BLOCKS) ---
 

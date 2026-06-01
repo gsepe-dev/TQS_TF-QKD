@@ -2,69 +2,9 @@ import netsquid as ns
 from netsquid.nodes import Node
 from netsquid.components import QuantumChannel
 from netsquid.components.models.qerrormodels import DepolarNoiseModel
-from netsquid.protocols import NodeProtocol
-from netsquid.qubits import qubitapi as qapi
-import random
 import math
-from randomness import generate_random_bit
-
-# =====================================================================
-# 1. PROTOCOLLI QUANTISTICI (FISICA DEI NODI E BSM)
-# =====================================================================
-
-class SenderProtocol(NodeProtocol):
-    """Protocollo per Alice e Bob: Generazione qubit con basi casuali."""
-    def __init__(self, node, port_name, num_bits, name="Sender"):
-        super().__init__(node, name)
-        self.port_name = port_name
-        self.num_bits = num_bits
-        self.raw_key = []
-        self.bases = []  # 0 = Base Z (Computazionale), 1 = Base X (Fase)
-
-    def run(self):
-        for i in range(self.num_bits):
-            bit = generate_random_bit()
-            basis = generate_random_bit()
-            self.raw_key.append(bit)
-            self.bases.append(basis)
-            
-            qubit, = qapi.create_qubits(1)
-            
-            if basis == 0:  
-                if bit == 1: qapi.operate(qubit, ns.X)
-            else:  
-                if bit == 1: qapi.operate(qubit, ns.X)
-                qapi.operate(qubit, ns.H)
-                
-            self.node.ports[self.port_name].tx_output(qubit)
-            yield self.await_timer(10)
-
-
-class CharlieProtocol(NodeProtocol):
-    """Protocollo per Charlie: Bell State Measurement (BSM) simmetrico."""
-    def __init__(self, node, port_a, port_b, num_bits, name="Charlie"):
-        super().__init__(node, name)
-        self.port_a = port_a
-        self.port_b = port_b
-        self.num_bits = num_bits
-        self.announcements = []
-
-    def run(self):
-        for i in range(self.num_bits):
-            yield self.await_port_input(self.node.ports[self.port_a]) & \
-                  self.await_port_input(self.node.ports[self.port_b])
-            
-            qubit_a = self.node.ports[self.port_a].rx_input().items[0]
-            qubit_b = self.node.ports[self.port_b].rx_input().items[0]
-            
-            # BSM: CNOT (A controllo, B target) seguito da Hadamard su A
-            qapi.operate([qubit_a, qubit_b], ns.CX)
-            qapi.operate(qubit_a, ns.H)
-            
-            res_a, _ = qapi.measure(qubit_a)
-            res_b, _ = qapi.measure(qubit_b)
-            
-            self.announcements.append((res_a, res_b))
+from senderProtocol import SenderProtocolAdvanced
+from charlieProtocol import CharlieProtocolAdvanced
 
 # =====================================================================
 # 2. METRICHE DI SICUREZZA (TEORIA DELL'INFORMAZIONE)
@@ -93,12 +33,12 @@ def run_single_simulation(num_bits=200, noise_rate=0.0):
     alice.ports["port_out"].connect(channel_a.ports["send"]); channel_a.ports["recv"].connect(charlie.ports["port_in_a"])
     bob.ports["port_out"].connect(channel_b.ports["send"]); channel_b.ports["recv"].connect(charlie.ports["port_in_b"])
     
-    proto_alice = SenderProtocol(alice, "port_out", num_bits=num_bits)
-    proto_bob = SenderProtocol(bob, "port_out", num_bits=num_bits)
-    proto_charlie = CharlieProtocol(charlie, "port_in_a", "port_in_b", num_bits=num_bits)
+    proto_alice = SenderProtocolAdvanced(alice, "port_out", num_bits=num_bits)
+    proto_bob = SenderProtocolAdvanced(bob, "port_out", num_bits=num_bits)
+    proto_charlie = CharlieProtocolAdvanced(charlie, "port_in_a", "port_in_b", num_bits=num_bits)
     
     # Avvio Simulazione
-    proto_alice.start(); proto_bob.start(); proto_charlie.start()
+    proto_charlie.start(); proto_alice.start(); proto_bob.start()
     ns.sim_run()
     
     # --- SIFTING CLASSICO ---
