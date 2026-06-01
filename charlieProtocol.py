@@ -43,7 +43,7 @@ class CharlieProtocol(NodeProtocol):
             qapi.discard(qubit_a)
             
             self.announcements.append(res_parity)
-            print(f"   -> [Charlie] Qubit {i+1}: Parità rilevata = {'Uguali (0)' if res_parity == 0 else 'Diversi (1)'}")
+            #print(f"   -> [Charlie] Qubit {i+1}: Parità rilevata = {'Uguali (0)' if res_parity == 0 else 'Diversi (1)'}")
 
 
 
