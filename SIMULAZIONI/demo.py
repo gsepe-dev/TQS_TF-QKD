@@ -9,11 +9,12 @@ from charlieProtocol import CharlieProtocol
 def setup_and_run_tfqkd(num_bits=15, noise_probability=0.0):
     ns.sim_reset()
     
+    # creazione nodi coinvolti nella comunicazione
     alice = Node("Alice", port_names=["port_out"])
     bob = Node("Bob", port_names=["port_out"])
     charlie = Node("Charlie", port_names=["port_in_a", "port_in_b"])
     
-    # Canali fisici standard senza modelli esterni bloccanti
+    # creazione canali fisici standard
     channel_a = QuantumChannel("Channel_Alice_Charlie", delay=10)
     channel_b = QuantumChannel("Channel_Bob_Charlie", delay=10)
     
@@ -26,9 +27,7 @@ def setup_and_run_tfqkd(num_bits=15, noise_probability=0.0):
     proto_alice = SenderProtocol(alice, "port_out", num_bits=num_bits)
     proto_bob = SenderProtocol(bob, "port_out", num_bits=num_bits)
     
-    # Passiamo la probabilità di rumore direttamente al setup di Charlie
-    proto_charlie = CharlieProtocol(charlie, "port_in_a", "port_in_b", 
-                                    num_bits=num_bits, noise_probability=noise_probability)
+    proto_charlie = CharlieProtocol(charlie, "port_in_a", "port_in_b", num_bits=num_bits, noise_probability=noise_probability)
     
     # il metodo start crea un thread che esegue il codice contenuto nel metodo run della classe
     proto_alice.start()
