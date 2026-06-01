@@ -76,3 +76,4 @@ class CharlieProtocolAdvanced(NodeProtocol):
             
             # Charlie pubblica i risultati di misurazione di entrambi i qubit
             self.announcements.append((res_a, res_b))
+            #print(f"res_a == {res_a}, res_b = {res_b}")
