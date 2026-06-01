@@ -37,7 +37,7 @@ def binary_entropy(p):
 # 3. ENGINE DELLA SINGOLA SIMULAZIONE FISICA
 # =====================================================================
 
-def run_single_simulation(num_bits=160, noise_rate=0.0, block_size=4):
+def run_single_simulation(num_bits=25, noise_rate=0.0, block_size=4):
     ns.sim_reset()
     
     # Inizializzazione Rete e Modello di Rumore Termico
@@ -116,13 +116,17 @@ def run_ultimate_benchmark(iterations_per_step=100):
     
     noise_steps = [round(x * 0.03, 2) for x in range(11)]  # Da 0.0 a 0.30
     for noise in noise_steps:
-        t_qber, t_skr, success_c = 0, 0, 0
+        t_qber, success_c = 0, 0
         for _ in range(iterations_per_step):
-            qber, skr, success = run_single_simulation(num_bits=200, noise_rate=noise, block_size=4)
-            t_qber += qber; t_skr += skr
+            qber, _, success = run_single_simulation(num_bits=25, noise_rate=noise, block_size=4)
+            t_qber += qber
             if success: success_c += 1
                 
-        print(f"{noise:<15.2f}{(t_qber/iterations_per_step)*100:<18.1f}%{t_skr/iterations_per_step:<15.4f}{(success_c/iterations_per_step)*100:>5.1f}%")
+        # Calcolo l'SKR sul QBER medio globale alla fine del ciclo
+        avg_qber = t_qber / iterations_per_step
+        skr_teorico = max(0, 1 - 2 * binary_entropy(avg_qber))
+        
+        print(f"{noise:<15.2f}{avg_qber*100:<17.1f}% {skr_teorico:<14.4f}{(success_c/iterations_per_step)*100:>5.1f}%")
 
     # -----------------------------------------------------------------
     # TEST 2: Ottimizzazione Cascade (Limite Classico)
@@ -136,13 +140,17 @@ def run_ultimate_benchmark(iterations_per_step=100):
     blocks = [2, 4, 8, 16]
     fixed_noise = 0.06
     for b_size in blocks:
-        t_qber, t_skr, success_c = 0, 0, 0
+        t_qber, success_c = 0, 0
         for _ in range(iterations_per_step):
-            qber, skr, success = run_single_simulation(num_bits=200, noise_rate=fixed_noise, block_size=b_size)
-            t_qber += qber; t_skr += skr
+            qber, _, success = run_single_simulation(num_bits=25, noise_rate=fixed_noise, block_size=b_size)
+            t_qber += qber
             if success: success_c += 1
                 
-        print(f"{b_size:<15}{(t_qber/iterations_per_step)*100:<18.1f}{t_skr/iterations_per_step:<15.4f}{(success_c/iterations_per_step)*100:>5.1f}%")
+        # Calcolo l'SKR sul QBER medio globale alla fine del ciclo
+        avg_qber = t_qber / iterations_per_step
+        skr_teorico = max(0, 1 - 2 * binary_entropy(avg_qber))
+        
+        print(f"{b_size:<15}{avg_qber*100:<17.1f}% {skr_teorico:<14.4f}{(success_c/iterations_per_step)*100:>5.1f}%")
 
     print("\n" + "=" * 85)
     print(" BENCHMARK COMPLETO TERMINATO")
