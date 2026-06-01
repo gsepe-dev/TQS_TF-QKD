@@ -3,8 +3,8 @@ from netsquid.nodes import Node
 from netsquid.components import QuantumChannel
 from netsquid.components.models.qerrormodels import DepolarNoiseModel
 import math
-from senderProtocol import SenderProtocolAdvanced
-from charlieProtocol import CharlieProtocolAdvanced
+from PROTOCOLLI.senderProtocol import SenderProtocolAdvanced
+from PROTOCOLLI.charlieProtocol import CharlieProtocolAdvanced
 
 # =====================================================================
 # 2. METRICHE DI SICUREZZA (TEORIA DELL'INFORMAZIONE)

@@ -3,8 +3,8 @@ from netsquid.nodes import Node
 from netsquid.components import QuantumChannel
 from netsquid.components.models.qerrormodels import DepolarNoiseModel
 import random
-from senderProtocol import SenderProtocol
-from charlieProtocol import CharlieProtocol
+from PROTOCOLLI.senderProtocol import SenderProtocol
+from PROTOCOLLI.charlieProtocol import CharlieProtocol
 
 # --- ALGORITMO CLASSICO DI CORREZIONE ERRORE (CASCADE BLOCKS) ---
 

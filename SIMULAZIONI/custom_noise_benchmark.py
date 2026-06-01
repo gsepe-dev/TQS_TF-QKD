@@ -2,8 +2,8 @@ import netsquid as ns
 from netsquid.nodes import Node
 from netsquid.components import QuantumChannel
 import random
-from senderProtocol import SenderProtocol
-from charlieProtocol import CharlieProtocol
+from PROTOCOLLI.senderProtocol import SenderProtocol
+from PROTOCOLLI.charlieProtocol import CharlieProtocol
 
 # --- ALGORITMO CLASSICO DI CORREZIONE ERRORE ---
 
