@@ -96,7 +96,7 @@ def run_performance_benchmark(iterations_per_step=100):
     print("-" * 70)
     
     # Generiamo probabilità reali da 0.0 a 0.45 (step di 0.03)
-    noise_steps = [round(x * 0.03, 2) for x in range(16)]
+    noise_steps = [round(x * 0.05, 2) for x in range(21)]
     
     for noise in noise_steps:
         success_count = 0
