@@ -35,6 +35,7 @@ Apri il terminale nella cartella principale del progetto ed esegui i seguenti co
 conda create --prefix ./.venv python=3.10
 conda activate ./.venv
 ```
+(è importante che la versione di Python sia la 3.10 perché dalla 3.11 in poi alcune istruzioni hanno cambiato sintassi e quindi c'è il rischio che i vari programmi vadano in errore)
 
 ### Installazione di NetSquid
 NetSquid non è disponibile sul PyPI pubblico standard, ma deve essere installato contattando direttamente il loro repository ufficiale.
