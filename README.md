@@ -6,17 +6,17 @@ Il repository contiene il secondo progetto del corso [TECNOLOGIE QUANTISTICHE PE
 
 Utilizzando il simulatore [NetSquid](https://netsquid.org/) è stato implementato un simulatore di rete quantistica per il protocollo di distribuzione della chiave di tipo **Twin-Field (TF-QKD)**.
 
-In particolare, il progetto modella l'hardware quantistico e integra algoritmi classici per il Sifting, la Parameter Estimation e l'Information Reconciliation tramite il protocollo **Cascade**.
+In particolare, il progetto modella l'hardware quantistico e integra algoritmi classici per il Sifting, la Parameter Estimation e l'Information Reconciliation tramite il protocollo **Cascade** (di cui è stata implementata solo la prima parte, ovvero quella inerente il controllo del bit di parità sacrificando un piccolo numero di qubit).
 
 ## Componenti
 
 | Programma | Funzionalità |
 | :--- | :--- |
-| **`noise_free_benchmark_no_error_correction.py`** | **Proof of Concept**  - Esegue un test su 15 bit in assenza di rumore per validare la logica di scambio e la correzione di parità. |
-| **`noise_free_benchmark_with_cascade.py`** | **Parameter Estimation** -  Sacrifica alcuni bit per la stima del canale e implementa una prima versione deterministica dell'algoritmo Cascade su blocchi da 4 bit. |
-| **`noisy_benchmark_with_cascade.py`** | **Motore Fisico** - Attiva il `DepolarNoiseModel` di NetSquid per degradare le matrici di densità e mappa la resilienza di Cascade al variare del rumore hardware. |
-| **`entropy_calculator_noise_free.py`** | **Baseline Analitica** - Esegue cicli statistici asintotici calcolando l'entropia binaria di Shannon per dimostrare matematicamente il collasso della chiave oltre l'11% di QBER. |
-| **`entropy_calculator_noisy.py`** | **Simulatore Avanzato** - Integra Cascade, protocolli multi-base e rumore fisico per mappare sia i limiti quantistici che l'efficienza classica. |
+| **`little_noisy_no_error_correction.py`** | **Proof of Concept**  - Esegue un test su 15 bit in presenza di pochissimo rumore (prob. 1%) per validare la logica di scambio e la correzione di parità. |
+| **`noisy_benchmark_with_cascade.py`** | **Parameter Estimation** -  Sacrifica alcuni bit per la stima del canale rumoroso e implementa una prima versione deterministica dell'algoritmo Cascade su blocchi da 4 bit. |
+| **`double_noisy_benchmark_with_cascade.py`** | **Motore Fisico** - Attiva il `DepolarNoiseModel` di NetSquid (oltre al rumore di default) per degradare le matrici di densità e mappa la resilienza di Cascade al variare del rumore hardware. |
+| **`entropy_calculator_without_error_correction.py`** | **Baseline Analitica** - Esegue cicli statistici asintotici calcolando l'entropia binaria di Shannon per dimostrare matematicamente il collasso della chiave oltre l'11% di QBER. |
+| **`entropy_calculator_with_cascade.py`** | **Simulatore Avanzato** - Integra Cascade, protocolli multi-base e rumore fisico per mappare sia i limiti quantistici che l'efficienza classica. |
 
 ## Istruzioni
 
