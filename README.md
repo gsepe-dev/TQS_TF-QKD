@@ -12,9 +12,9 @@ In particolare, il progetto modella l'hardware quantistico e integra algoritmi c
 
 | Programma | Funzionalità |
 | :--- | :--- |
-| **`little_noisy_no_error_correction.py`** | **Proof of Concept**  - Esegue un test su 15 bit in presenza di pochissimo rumore (prob. 1%) per validare la logica di scambio e la correzione di parità. |
-| **`noisy_benchmark_with_cascade.py`** | **Parameter Estimation** -  Sacrifica alcuni bit per la stima del canale rumoroso e implementa una prima versione deterministica dell'algoritmo Cascade su blocchi da 4 bit. |
-| **`double_noisy_benchmark_with_cascade.py`** | **Motore Fisico** - Attiva il `DepolarNoiseModel` di NetSquid (oltre al rumore di default) per degradare le matrici di densità e mappa la resilienza di Cascade al variare del rumore hardware. |
+| **`constant_phase_flip_noise_no_error_correction.py`** | **Proof of Concept**  - Esegue un test su 15 bit in presenza di pochissimo rumore (prob. 1%) per validare la logica di scambio e la correzione di parità. |
+| **`depolar_noise_benchmark_with_cascade.py`** | **Parameter Estimation** -  Sacrifica alcuni bit per la stima del canale rumoroso e implementa una prima versione deterministica dell'algoritmo Cascade su blocchi da 4 bit. |
+| **`phase_flip_noise_benchmark_with_cascade.py`** | **Motore Fisico** - Attiva il `DepolarNoiseModel` di NetSquid (oltre al rumore di default) per degradare le matrici di densità e mappa la resilienza di Cascade al variare del rumore hardware. |
 | **`entropy_calculator_without_error_correction.py`** | **Baseline Analitica** - Esegue cicli statistici asintotici calcolando l'entropia binaria di Shannon per dimostrare matematicamente il collasso della chiave oltre l'11% di QBER. |
 | **`entropy_calculator_with_cascade.py`** | **Simulatore Avanzato** - Integra Cascade, protocolli multi-base e rumore fisico per mappare sia i limiti quantistici che l'efficienza classica. |
 
