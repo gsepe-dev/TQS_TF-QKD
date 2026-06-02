@@ -12,7 +12,7 @@ import random
 from PROTOCOLLI.senderProtocol import SenderProtocol
 from PROTOCOLLI.charlieProtocol import CharlieProtocol
 
-# --- ALGORITMO CLASSICO (PARZIALE) DI CORREZIONE ERRORE ---
+# Algoritmo di correzione errore Cascade (versione parziale)
 
 def cascade_correct_block(alice_blk, bob_blk):
     if sum(alice_blk) % 2 == sum(bob_blk) % 2:
@@ -30,8 +30,7 @@ def cascade_correct_block(alice_blk, bob_blk):
             bob_blk[3] = 1 - bob_blk[3]
     return bob_blk
 
-# --- FUNZIONE DI SIMULAZIONE SINGOLA ---
-
+# funzione che esegue una singola simulazione (delle 100 per ogni soglia)
 def run_single_simulation(num_bits=15, noise_probability=0.0):
     ns.sim_reset()
     
@@ -85,8 +84,8 @@ def run_single_simulation(num_bits=15, noise_probability=0.0):
     # Restituisce True se le chiavi finali da 12 bit coincidono al 100%
     return alice_sifted == bob_corrected
 
-# --- BENCHMARK LOOP ---
 
+# funzione che effettua tutte le simulazioni del caso
 def run_performance_benchmark(iterations_per_step=100):
     print("=" * 60)
     print(f"AVVIO BENCHMARK: {iterations_per_step} simulazioni per ogni livello di rumore")
@@ -115,8 +114,3 @@ def run_performance_benchmark(iterations_per_step=100):
 
 if __name__ == "__main__":
     run_performance_benchmark(iterations_per_step=100)
-
-
-
-
-# l'unica differnza con noisy_benchmark_with_cascade è che mancano le istruzioni a riga 37 (per il resto tutto identico)

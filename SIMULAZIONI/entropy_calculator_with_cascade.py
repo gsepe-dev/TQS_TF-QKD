@@ -12,12 +12,6 @@ import math
 from PROTOCOLLI.senderProtocol import SenderProtocolAdvanced
 from PROTOCOLLI.charlieProtocol import CharlieProtocolAdvanced
 
-
-
-# =====================================================================
-# 2. ALGORITMI CLASSICI (CORREZIONE ED ENTROPIA)
-# =====================================================================
-
 def cascade_correct_block(alice_blk, bob_blk):
     """Algoritmo classico ricorsivo per la correzione degli errori (Bisezione)."""
     if sum(alice_blk) % 2 == sum(bob_blk) % 2:
@@ -39,9 +33,6 @@ def binary_entropy(p):
         return 0
     return -p * math.log2(p) - (1 - p) * math.log2(1 - p)
 
-# =====================================================================
-# 3. ENGINE DELLA SINGOLA SIMULAZIONE FISICA
-# =====================================================================
 
 def run_single_simulation(num_bits=25, noise_rate=0.0, block_size=4):
     ns.sim_reset()
@@ -64,7 +55,7 @@ def run_single_simulation(num_bits=25, noise_rate=0.0, block_size=4):
     proto_alice.start(); proto_bob.start(); proto_charlie.start()
     ns.sim_run()
     
-    # --- POST-PROCESSING CLASSICO (SIFTING) ---
+    # sifting
     alice_raw, alice_bases, bob_bases = proto_alice.raw_key, proto_alice.bases, proto_bob.bases
     alice_sifted, bob_sifted = [], []
     
@@ -83,12 +74,12 @@ def run_single_simulation(num_bits=25, noise_rate=0.0, block_size=4):
             
     if len(alice_sifted) == 0: return 0.0, 0.0, False
         
-    # --- CALCOLO METRICHE (LEZIONE 2) ---
+    # calcolo metriche 
     errors = sum(1 for a, b in zip(alice_sifted, bob_sifted) if a != b)
     qber = errors / len(alice_sifted)
     skr = max(0, 1 - 2 * binary_entropy(qber))  # Secret Key Rate (Soglia ~11%)
     
-    # --- CORREZIONE ERRORE (CASCADE) ---
+    # correzione d'errore
     bob_corrected = []
     num_blocks = len(alice_sifted) // block_size
     for b in range(num_blocks):
@@ -103,18 +94,13 @@ def run_single_simulation(num_bits=25, noise_rate=0.0, block_size=4):
     
     return qber, skr, success
 
-# =====================================================================
-# 4. BENCHMARK COMPLETO (DOPPIO TEST)
-# =====================================================================
 
 def run_ultimate_benchmark(iterations_per_step=100):
     print("=" * 85)
     print(" AVVIO BENCHMARK QUANTISTICO COMPLETO (PROGETTO FASCIA ALTA)")
     print("=" * 85)
 
-    # -----------------------------------------------------------------
     # TEST 1: Impatto del Rumore sulla Sicurezza (Limite Quantistico)
-    # -----------------------------------------------------------------
     print("\n[ TEST 1: ANALISI QBER E SECRET KEY RATE (SOGLIA CRITICA 11%) ]")
     print("Obiettivo: Mappare l'orizzonte di sicurezza al variare del rumore del canale.")
     print(f"{'Prob. Rumore':<15}{'QBER Medio (%)':<18}{'SKR Teorico':<15}{'Successo Cascade'}")
@@ -134,9 +120,7 @@ def run_ultimate_benchmark(iterations_per_step=100):
         
         print(f"{noise:<15.2f}{avg_qber*100:<17.1f}% {skr_teorico:<14.4f}{(success_c/iterations_per_step)*100:>5.1f}%")
 
-    # -----------------------------------------------------------------
-    # TEST 2: Ottimizzazione Cascade (Limite Classico)
-    # -----------------------------------------------------------------
+    # TEST 2: Ottimizzazione Cascade
     print("\n" + "=" * 85)
     print("\n[ TEST 2: IMPATTO DELLA DIMENSIONE DEL BLOCCO CLASSICO CASCADE ]")
     print("Obiettivo: Trovare l'efficienza ottimale dell'algoritmo con un rumore fisso (6%).")

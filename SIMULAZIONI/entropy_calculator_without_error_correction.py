@@ -12,19 +12,12 @@ import math
 from PROTOCOLLI.senderProtocol import SenderProtocolAdvanced
 from PROTOCOLLI.charlieProtocol import CharlieProtocolAdvanced
 
-# =====================================================================
-# 2. METRICHE DI SICUREZZA (TEORIA DELL'INFORMAZIONE)
-# =====================================================================
-
 def binary_entropy(p):
     """Calcola l'entropia binaria di Shannon (necessaria per il calcolo dell'SKR)."""
     if p <= 0 or p >= 1:
         return 0
     return -p * math.log2(p) - (1 - p) * math.log2(1 - p)
 
-# =====================================================================
-# 3. ENGINE DELLA SINGOLA SIMULAZIONE FISICA
-# =====================================================================
 
 def run_single_simulation(num_bits=25, noise_rate=0.0):
     ns.sim_reset()
@@ -48,7 +41,7 @@ def run_single_simulation(num_bits=25, noise_rate=0.0):
     #ns.sim_run()
     ns.sim_run(duration=num_bits * 11)
     
-    # --- SIFTING CLASSICO ---
+    # sifting
     alice_raw, alice_bases, bob_bases = proto_alice.raw_key, proto_alice.bases, proto_bob.bases
     alice_sifted, bob_sifted = [], []
     
@@ -66,16 +59,14 @@ def run_single_simulation(num_bits=25, noise_rate=0.0):
             
     if len(alice_sifted) == 0: return 0.0, 0.0
         
-    # --- CALCOLO METRICHE (QBER E SKR) ---
+    # calcolo metriche
     errors = sum(1 for a, b in zip(alice_sifted, bob_sifted) if a != b)
     qber = errors / len(alice_sifted)
     skr = max(0, 1 - 2 * binary_entropy(qber))
     
     return qber, skr
 
-# =====================================================================
-# 4. BENCHMARK DEL CANALE QUANTISTICO
-# =====================================================================
+
 
 def run_physical_benchmark(iterations_per_step=100):
     print("=" * 70)

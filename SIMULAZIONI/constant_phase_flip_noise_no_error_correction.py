@@ -45,7 +45,7 @@ def setup_and_run_tfqkd(num_bits=15, noise_probability=0.0):
     print(f"--- Inizio Simulazione: Scambio di {num_bits} bit [Probabilità Rumore: {noise_probability * 100}%] ---")
     ns.sim_run()
     
-    # --- RICONCILIAZIONE DELLA CHIAVE ---
+    # Alice apprende la chiave inviata da Bob tramite Charlie
     print("\n--- Riconciliazione Classica ---")
     alice_final_key = proto_alice.raw_key
     bob_final_key = []
@@ -70,7 +70,6 @@ def setup_and_run_tfqkd(num_bits=15, noise_probability=0.0):
     qber = (errors / num_bits) * 100
     print(f"QBER calcolato sulla chiave finale: {qber:.2f}%")
 
-    # --- NUOVA VERIFICA DELLA SOGLIA DI SICUREZZA ---
     SOGLIA_CRITICA_QBER = 11.0  # Soglia classica dell'11%
     
     if qber == 0:

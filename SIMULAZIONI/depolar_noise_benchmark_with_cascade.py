@@ -30,8 +30,6 @@ def cascade_correct_block(alice_blk, bob_blk):
             bob_blk[3] = 1 - bob_blk[3]
     return bob_blk
 
-# --- ESECUZIONE DELLA SINGOLA SIMULAZIONE FISICA ---
-
 def run_single_simulation(num_bits=15, noise_rate=0.0):
     ns.sim_reset()
     
@@ -86,7 +84,6 @@ def run_single_simulation(num_bits=15, noise_rate=0.0):
         
     return alice_sifted == bob_corrected
 
-# --- LOOP DI BENCHMARK REALISTICO ---
 def run_performance_benchmark(iterations_per_step=100):
     print("=" * 70)
     print(f"AVVIO BENCHMARK QUANTISTICO REALISTICO ({iterations_per_step} test per step)")
