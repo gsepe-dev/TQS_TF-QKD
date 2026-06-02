@@ -47,7 +47,7 @@ Esegui questo comando sostituendo _username_ e _password_ con le tue credenziali
 pip install --extra-index-url 'https://<username>:<password>@pypi.netsquid.org' netsquid
 ```
 
-*Attenzione*: Se la password contiene caratteri speciali, devi codificarli in formato URL-encoded (HTML) affinché il comando bash riesca ad interpretarli correttamente.
+*Attenzione*: Se la password contiene caratteri speciali, devi codificarli in formato URL-encoded (HTML) affinché il comando bash riesca ad interpretarli correttamente. Se ad esempio la password presenta il carattere '!', dovrai inserirlo come '%3F'
 
 ## Esecuzione
 Una volta attivato l'ambiente e installate le dipendenze, puoi lanciare qualsiasi benchmark o calcolatore della suite passando il nome del file al comando python:
