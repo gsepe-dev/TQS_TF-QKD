@@ -1,3 +1,11 @@
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+
+
 import netsquid as ns
 from netsquid.nodes import Node
 from netsquid.components import QuantumChannel
