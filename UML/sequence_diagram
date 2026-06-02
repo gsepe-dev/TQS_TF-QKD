@@ -1,0 +1,56 @@
+@startuml
+autonumber
+skinparam BoxPadding 10
+skinparam ParticipantPadding 12
+skinparam shadowing false
+
+box "Strato Hardware (NetSquid)" #LightBlue
+actor "Alice\n(Sender)" as A
+entity "Canale Ottico A" as ChA
+control "Charlie\n(BSM Node)" as C
+entity "Canale Ottico B" as ChB
+actor "Bob\n(Sender)" as B
+end box
+
+box "Post-Processing Classico (Python)" #LightGreen
+entity "Sifting &\nParameter Estimation" as PP
+database "Algoritmo\nCascade" as EC
+end box
+
+== FASE 1: TRASMISSIONE QUANTISTICA GENERALE ==
+A -> A: Genera sequenza di bit casuali
+B -> B: Genera sequenza di bit casuali
+A -> ChA: Invia Qubit codificato (Base di Fase)
+B -> ChB: Invia Qubit codificato (Base di Fase)
+
+note over ChA, ChB #FFAAAA
+  **Nel benchmark Depolarizzazione:** Il rumore agisce qui nei canali.
+  **Nel benchmark Phase-Flip:** I canali sono specchiati e puliti.
+end note
+
+ChA -> C: Consegna Qubit ad Alice
+ChB -> C: Consegna Qubit a Bob
+
+== FASE 2: MISURAZIONE E INIEZIONE RUMORE SOFTWARE ==
+alt Se noise_probability > 0 (Solo in Phase-Flip Benchmark)
+    C -> C: Applica porta Z a sorpresa su Qubit A/B (Phase-Flip)
+end
+C -> C: Esegue circuito di misurazione della parità
+C -> PP: Annuncia pubblicamente il bit di parità (announcements)
+
+== FASE 3: ELABORAZIONE E RICONCILIERAZIONE CLASSICA ==
+PP -> PP: Bob inverte il bit locale se la parità di Charlie == 1
+PP -> PP: Sacrificio casuale di 3 bit (Parameter Estimation)
+PP -> EC: Splitta i 12 bit rimanenti in 3 blocchi da 4 bit
+
+loop Per ogni blocco da 4 bit
+    EC -> EC: Controllo delle parità dei blocchi ($sum \% 2$)
+    alt Parità differenti (Rilevato Errore)
+        EC -> EC: Avvia bisezione ricorsiva (Cascade)
+        EC -> EC: Trova l'indice esatto del bit errato
+        EC -> EC: Bob inverte il bit fallato -> **Errore Corretto**
+    end
+end
+
+EC --> PP: Restituisce l'esito del matching finale (True/False)
+@enduml
