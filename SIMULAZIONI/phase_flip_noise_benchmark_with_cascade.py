@@ -51,7 +51,7 @@ def run_single_simulation(num_bits=15, noise_probability=0.0):
     
     proto_alice = SenderProtocol(alice, "port_out", num_bits=num_bits)
     proto_bob = SenderProtocol(bob, "port_out", num_bits=num_bits)
-    proto_charlie = CharlieProtocol(charlie, "port_in_a", "port_in_b", num_bits=num_bits)
+    proto_charlie = CharlieProtocol(charlie, "port_in_a", "port_in_b", num_bits=num_bits, noise_probability=noise_probability)
     
     proto_alice.start()
     proto_bob.start()
