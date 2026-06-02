@@ -5,13 +5,13 @@ import random
 
 
 class CharlieProtocol(NodeProtocol):
-    """Protocollo per Charlie: Bell State Measurement (BSM) simmetrico."""
+    #Protocollo usato da Charlie: Bell State Measurement (BSM) simmetrico
     def __init__(self, node, port_a, port_b, num_bits, noise_probability=0.0, name="Charlie"):
         super().__init__(node, name)
         self.port_a = port_a
         self.port_b = port_b
         self.num_bits = num_bits
-        self.noise_probability = noise_probability # Controllo manuale del rumore
+        self.noise_probability = noise_probability
         self.announcements = []
 
     # usato in demo, custom_noise e performance
@@ -43,6 +43,7 @@ class CharlieProtocol(NodeProtocol):
             qapi.discard(qubit_a)
             
             self.announcements.append(res_parity)
+            # stampa di log
             #print(f"   -> [Charlie] Qubit {i+1}: Parità rilevata = {'Uguali (0)' if res_parity == 0 else 'Diversi (1)'}")
 
 
@@ -55,7 +56,7 @@ class CharlieProtocolAdvanced(NodeProtocol):
         self.port_a = port_a
         self.port_b = port_b
         self.num_bits = num_bits
-        self.noise_probability = noise_probability # Controllo manuale del rumore
+        self.noise_probability = noise_probability
         self.announcements = []
 
     # usato in advanced_simulator e shannon_simulator
